@@ -39,8 +39,6 @@ services:
     user: postgres
     env_file:
       - .env.database
-    # secrets:
-    #   - db-password
     volumes:
       - db-data:/var/lib/postgresql/data
     expose:
