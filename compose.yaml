@@ -1,0 +1,52 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: ./containers/server/Dockerfile
+    environment:
+      NODE_ENV: production
+    depends_on:
+      migration:
+        condition: service_completed_successfully  # Wait for migration to finish successfully
+    env_file:
+      - .env.prod
+    ports:
+      - "8080:8080"
+    restart: always  # Ensures the server keeps running
+
+  migration:
+    build:
+      context: .
+      dockerfile: ./containers/migrator/Dockerfile
+    env_file:
+      - .env.prod
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"  # Don't restart the migrator after it completes
+
+  db:
+    image: postgres:latest
+    restart: always
+    user: postgres
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: example
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+
+secrets:
+  db-password:
+    file: db/password.txt
