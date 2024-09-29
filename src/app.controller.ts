@@ -8,6 +8,5 @@ export class AppController {
   @Get()
   getAll(){
     return this.appService.getAll()
-    // return {message: 'Hello World!'}
   }
 }
