@@ -20,12 +20,12 @@ jobs:
 
       - name: Build Docker containers
         run: |
-          docker-compose -f compose.yml build  # Build the containers defined in your docker-compose file
+          docker-compose -f compose.yaml build  # Build the containers defined in your docker-compose file
 
       - name: Run tests
         run: |
-          docker-compose -f compose.yml up --abort-on-container-exit  # Start the containers and run tests
+          docker-compose -f compose.yaml up --abort-on-container-exit  # Start the containers and run tests
           
       - name: Clean up
         if: always()  # This step will run even if previous steps fail
-        run: docker-compose -f compose.yml down  # Stop and remove containers
+        run: docker-compose -f compose.yaml down  # Stop and remove containers
