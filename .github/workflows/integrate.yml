@@ -1,0 +1,20 @@
+name : "My ci"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_my_code:
+      run-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-node@v2
+          with:
+            node-version: 14.x
+        - run: npm ci
+        - run: npm run build
+        - name: Run tests
+          run: npm run test
