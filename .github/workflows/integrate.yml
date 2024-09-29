@@ -19,10 +19,22 @@ jobs:
           sudo apt-get install -y docker-compose  # Install Docker Compose
 
       - name: Build Docker containers
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DATABASE_PASSWORD: ${{ env.DATABASE_PASSWORD }}
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
+          PORT: 8080
+          # Add more secrets as needed
         run: |
           docker-compose -f compose.yaml build  # Build the containers defined in your docker-compose file
 
       - name: Run tests
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DATABASE_PASSWORD: ${{ env.DATABASE_PASSWORD }}
+          PORT: 8080
+          # Add more secrets as needed
         run: |
           docker-compose -f compose.yaml up --abort-on-container-exit  # Start the containers and run tests
           
