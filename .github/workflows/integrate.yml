@@ -3,8 +3,6 @@ name: "My CI"
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   test_my_code:
@@ -17,7 +15,7 @@ jobs:
         with:
           node-version: 14.x
 
-      - run: npm ci
+      - run: npm i
 
       - run: npm run build
 
