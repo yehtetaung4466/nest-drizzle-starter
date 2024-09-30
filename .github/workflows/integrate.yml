@@ -19,11 +19,11 @@ jobs:
           sudo apt-get install -y docker-compose  # Install Docker Compose
 
       - name: Build Docker containers
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          DATABASE_PASSWORD: ${{ env.DATABASE_PASSWORD }}
-          POSTGRES_DB: ${{env.POSTGRES_DB}}
-          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
+        env: 
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          POSTGRES_DB: ${{secrets.POSTGRES_DB}}
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
           PORT: 8080
           # Add more secrets as needed
         run: |
@@ -31,8 +31,8 @@ jobs:
 
       - name: Run tests
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          DATABASE_PASSWORD: ${{ env.DATABASE_PASSWORD }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           PORT: 8080
           # Add more secrets as needed
         run: |
