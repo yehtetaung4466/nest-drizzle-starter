@@ -22,8 +22,8 @@ jobs:
         run: |
           touch .env.database
           touch .env.prod
-          echo POSTGRES_DB=example POSTGRES_PASSWORD=password > .env.database
-          echo DATABASE_URL=postgres://postgres:password@db:5432/example PORT=8080 DATABASE_PASSWORD=password POSTGRES_USER=postgres > .env.prod
+          echo POSTGRES_DB=example POSTGRES_PASSWORD=password POSTGRES_USER=postgres > .env.database
+          echo DATABASE_URL=postgres://postgres:password@db:5432/example PORT=8080 DATABASE_PASSWORD=password > .env.prod
 
       - name: Build Docker containers
         run: |
