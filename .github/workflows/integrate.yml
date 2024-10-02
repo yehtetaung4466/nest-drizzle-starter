@@ -2,9 +2,9 @@ name: "My CI"
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master ]  # Change to 'main' if you intend to use 'main'
   pull_request:
-    branches: [ main ]
+    branches: [ master ]  # Change to 'main' if needed
 
 jobs:
   test_my_code:
@@ -18,26 +18,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose  # Install Docker Compose
 
+      - name: Prepare environment files
+        run: |
+          touch .env.database
+          touch .env.prod
+          echo POSTGRES_DB=example POSTGRES_PASSWORD=password > .env.database
+          echo DATABASE_URL=postgres://postgres:password@db:5432/example PORT=8080 DATABASE_PASSWORD=password > .env.prod
+
       - name: Build Docker containers
-        env: 
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          POSTGRES_DB: ${{secrets.POSTGRES_DB}}
-          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
-          PORT: 8080
-          # Add more secrets as needed
         run: |
           docker-compose -f compose.yaml build  # Build the containers defined in your docker-compose file
 
       - name: Run tests
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          PORT: 8080
-          # Add more secrets as needed
         run: |
           docker-compose -f compose.yaml up --abort-on-container-exit  # Start the containers and run tests
-          
+
       - name: Clean up
         if: always()  # This step will run even if previous steps fail
         run: docker-compose -f compose.yaml down  # Stop and remove containers
