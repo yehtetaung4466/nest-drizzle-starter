@@ -2,9 +2,9 @@ name: "My CI"
 
 on:
   push:
-    branches: [ master ]  # Change to 'main' if you intend to use 'main'
+    branches: [ master ]  # Change to 'main' if you use 'main'
   pull_request:
-    branches: [ master ]  # Change to 'main' if needed
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -13,17 +13,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH
+      - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.REMOTE_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.REMOTE_SSH_KEY }}" > ~/.ssh/id_rsa_work_to_home
+          chmod 600 ~/.ssh/id_rsa_work_to_home
 
       - name: Start SSH agent and add private key
         run: |
           eval $(ssh-agent -s)
-          echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa_work_to_home
+
+      - name: Add remote host to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to remote server
         run: |
