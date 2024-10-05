@@ -23,10 +23,10 @@ jobs:
         run: |
           eval $(ssh-agent -s)
           echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa_work_to_home
-      - name: Add remote host to known hosts
-        run: |
-          echo "Checking host: ${{ secrets.REMOTE_HOST }}"
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/know_hosts
+      # - name: Add remote host to known hosts
+      #   run: |
+      #     echo "Checking host: ${{ secrets.REMOTE_HOST }}"
+      #     ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/know_hosts
       - name: Deploy to remote server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
