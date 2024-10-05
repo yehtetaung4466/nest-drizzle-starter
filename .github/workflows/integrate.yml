@@ -23,7 +23,6 @@ jobs:
         run: |
           eval $(ssh-agent -s)
           echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa_work_to_home
-          echo "from github" hi_github
       - name: Add remote host to known hosts
         run: |
           echo "Checking host: ${{ secrets.REMOTE_HOST }}"
@@ -33,4 +32,4 @@ jobs:
       - name: Deploy to remote server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
-          "cd ${{ secrets.REMOTE_DIR }} && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
+          "echo "from github" > hi_github && cd ${{ secrets.REMOTE_DIR }} && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
