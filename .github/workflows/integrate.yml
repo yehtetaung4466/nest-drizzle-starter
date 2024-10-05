@@ -30,5 +30,5 @@ jobs:
         
       - name: Deploy to remote server
         run: |
-          ssh -i -vvv ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
+          ssh -vvv -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
           "echo "from github" > hi_github && cd ${{ secrets.REMOTE_DIR }} && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
