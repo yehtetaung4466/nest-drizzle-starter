@@ -27,8 +27,6 @@ jobs:
         run: |
           echo "Checking host: ${{ secrets.REMOTE_HOST }}"
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} || echo "ssh-keyscan failed"
-
-
       - name: Deploy to remote server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
