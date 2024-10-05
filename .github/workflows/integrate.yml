@@ -32,9 +32,5 @@ jobs:
 
       - name: Deploy to remote server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
-            cd ${{ secrets.REMOTE_DIR }}
-            git pull
-            docker-compose -f compose.yaml build
-            docker-compose -f compose.yaml up -d --remove-orphans
-          EOF
+          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
+          "cd ${{ secrets.REMOTE_DIR }} && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
