@@ -27,9 +27,13 @@ jobs:
         run: |
           echo "${{ secrets.REMOTE_HOST }}" >> ~/.ssh/known_hosts
           echo "${{ secrets.KNOW_HOSTS }}" >> ~/.ssh/known_hosts
+      - name: Test SSH Connection
+        run: |
+          ssh -vvv -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "echo 'SSH connection successful'"
+        
       - name: Deploy to remote server
         run: |
           ssh -vvv -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
           "echo "from github" > hi_github && cd ${{ secrets.REMOTE_DIR }} && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
 
-          
+
