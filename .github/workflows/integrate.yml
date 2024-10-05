@@ -48,22 +48,14 @@ jobs:
     steps:
       - name: Set up SSH
         run: |
+          mkdir -p ~/.ssh  # Create the .ssh directory if it doesn't exist
           echo "${{ secrets.REMOTE_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
-
       - name: Deploy to remote server
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
             cd ${{ secrets.REMOTE_DIR }}
-            # Prepare environment files
-            echo POSTGRES_DB=${{secrets.POSTGRES_DB}} > .env.database
-            echo POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}} >> .env.database
-            echo DATABASE_URL=${{secrets.DATABASE_URL}} > .env.prod
-            echo PORT=${{secrets.PORT}} >> .env.prod
-            echo DATABASE_PASSWORD=${{secrets.DATABASE_PASSWORD}} >> .env.prod
-
-            # Pull latest code and redeploy
             git pull
             docker-compose -f compose.yaml build
             docker-compose -f compose.yaml up -d --remove-orphans
