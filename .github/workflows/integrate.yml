@@ -27,7 +27,6 @@ jobs:
         run: |
           echo "${{ secrets.REMOTE_HOST }}" >> ~/.ssh/known_hosts
           echo "${{ secrets.KNOW_HOSTS }}" >> ~/.ssh/known_hosts
-        
       - name: Deploy to remote server
         run: |
           ssh -vvv -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
