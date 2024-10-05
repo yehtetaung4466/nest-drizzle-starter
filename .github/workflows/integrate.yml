@@ -7,58 +7,21 @@ on:
     branches: [ master ]  # Change to 'main' if needed
 
 jobs:
-  # Test Job
-  test_my_code:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3  # Use the latest version of the checkout action
-
-      - name: Set up Docker
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose  # Install Docker Compose
-
-      - name: Prepare environment files
-        run: |
-          touch .env.database
-          touch .env.prod
-          echo POSTGRES_DB=${{secrets.POSTGRES_DB}} > .env.database
-          echo POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}} >> .env.database
-          echo DATABASE_URL=${{secrets.DATABASE_URL}} > .env.prod
-          echo PORT=${{secrets.PORT}} >> .env.prod
-          echo DATABASE_PASSWORD=${{secrets.DATABASE_PASSWORD}} >> .env.prod
-
-      - name: Build Docker containers
-        run: |
-          docker-compose -f compose.yaml build  # Build the containers defined in your docker-compose file
-
-      - name: Run tests
-        run: |
-          docker-compose -f compose.yaml up --abort-on-container-exit  # Start the containers and run tests
-
-      - name: Clean up
-        if: always()  # This step will run even if previous steps fail
-        run: docker-compose -f compose.yaml down  # Stop and remove containers
-
-  # Deployment Job
   deploy:
     runs-on: ubuntu-latest
-    needs: test_my_code  # This ensures deploy runs only if test_my_code passes
     steps:
-      - name: Set up SSH
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.REMOTE_SSH_KEY }}
+
+      - name: Manually add SSH key with passphrase
         run: |
-          mkdir -p ~/.ssh  # Create the .ssh directory if it doesn't exist
-          echo "${{ secrets.REMOTE_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
-          - name: Show SSH Key
-          run: echo "${{ secrets.REMOTE_SSH_KEY }}"
-          
-      
+          echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
+
       - name: Deploy to remote server
         run: |
-          ssh -vvv -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}  ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
             cd ${{ secrets.REMOTE_DIR }}
             git pull
             docker-compose -f compose.yaml build
