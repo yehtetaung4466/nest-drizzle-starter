@@ -26,7 +26,9 @@ jobs:
 
       - name: Add remote host to known hosts
         run: |
-          ssh-keyscan -vvv -H 192.168.100.90 >> ~/.ssh/known_hosts
+          echo "Attempting to add ${REMOTE_HOST} to known hosts"
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} -vvv >> ~/.ssh/known_hosts 2> ssh_keyscan_error.log || true
+          cat ssh_keyscan_error.log
 
       - name: Test SSH Connection
         run: |
