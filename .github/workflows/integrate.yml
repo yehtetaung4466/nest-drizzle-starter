@@ -22,17 +22,17 @@ jobs:
       - name: Start SSH agent and add private key
         run: |
           eval $(ssh-agent -s)
-          echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa_work_to_home
+          ssh-add ~/.ssh/id_rsa_work_to_home
+
       - name: Add remote host to known hosts
         run: |
-          echo "${{ secrets.REMOTE_HOST }}" >> ~/.ssh/known_hosts
-          echo "${{ secrets.KNOW_HOSTS }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+
       - name: Test SSH Connection
         run: |
           ssh -vvv -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "echo 'SSH connection successful'"
+
       - name: Deploy to remote server
         run: |
           ssh -vvv -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
-          "echo "from github" > hi_github && cd ${{ secrets.REMOTE_DIR }} && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
-
-
+          "echo 'from github' > hi_github && cd ${{ secrets.REMOTE_DIR }} && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
