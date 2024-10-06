@@ -16,7 +16,7 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{secrets.REMOTE_SSH_KEY}}"" > ~/.ssh/id_rsa_work_to_home
+          echo "${{secrets.REMOTE_SSH_KEY}}" > ~/.ssh/id_rsa_work_to_home
           chmod 600 ~/.ssh/id_rsa_work_to_home
 
       - name: Start SSH agent and add private key
