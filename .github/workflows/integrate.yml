@@ -26,7 +26,6 @@ jobs:
           chmod +x ~/askpass.sh
           export SSH_ASKPASS=~/askpass.sh
           setsid ssh-add ~/.ssh/id_rsa_work_to_home < /dev/null
-        
       - name: Add remote host to known hosts
         run: |
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
