@@ -29,7 +29,6 @@ jobs:
           echo "Attempting to add ${REMOTE_HOST} to known hosts"
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} -vvv >> ~/.ssh/known_hosts 2> ssh_keyscan_error.log || true
           cat ssh_keyscan_error.log
-
       - name: Test SSH Connection
         run: |
           ssh -vvv -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "echo 'SSH connection successful'"
