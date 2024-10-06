@@ -16,24 +16,25 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.REMOTE_SSH_KEY }}" > ~/.ssh/id_rsa_work_to_home
+          echo "${{secrets.REMOTE_SSH_KEY}}"" > ~/.ssh/id_rsa_work_to_home
           chmod 600 ~/.ssh/id_rsa_work_to_home
 
       - name: Start SSH agent and add private key
         run: |
           eval $(ssh-agent -s)
-          echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa_work_to_home
+          echo "446646804" | ssh-add ~/.ssh/id_rsa_work_to_home
 
       - name: Add remote host to known hosts
         run: |
-          echo "Attempting to add ${REMOTE_HOST} to known hosts"
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} -vvv >> ~/.ssh/known_hosts 2> ssh_keyscan_error.log || true
+          echo "Attempting to add 192.168.100.90 to known hosts"
+          ssh-keyscan -H 192.168.100.90 -vvv >> ~/.ssh/known_hosts 2> ssh_keyscan_error.log || true
           cat ssh_keyscan_error.log
+
       - name: Test SSH Connection
         run: |
-          ssh -vvv -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "echo 'SSH connection successful'"
+          ssh -vvv -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/.ssh/id_rsa_work_to_home yehtetaung@192.168.100.90 "echo 'SSH connection successful'"
 
       - name: Deploy to remote server
         run: |
-          ssh -vvv -i ~/.ssh/id_rsa_work_to_home ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
-          "echo 'from github' > hi_github && cd ${{ secrets.REMOTE_DIR }} && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
+          ssh -vvv -i ~/.ssh/id_rsa_work_to_home yehtetaung@192.168.100.90 \
+          "echo 'from github' > hi_github && cd /path/to/your/remote/directory && git pull && docker-compose -f compose.yaml build && docker-compose -f compose.yaml up -d --remove-orphans"
