@@ -29,6 +29,13 @@ jobs:
           echo "Attempting to add 192.168.100.90 to known hosts"
           ssh-keyscan -H 192.168.100.90 -vvv >> ~/.ssh/known_hosts 2> ssh_keyscan_error.log || true
           cat ssh_keyscan_error.log
+      - name: Debug Network Connectivity
+        run: |
+          echo "Attempting to ping remote server"
+          ping -c 4 192.168.100.90 || true
+          echo "Attempting to resolve the host"
+          nslookup 192.168.100.90 || true
+
 
       - name: Test SSH Connection
         run: |
