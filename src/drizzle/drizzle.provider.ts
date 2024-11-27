@@ -12,7 +12,6 @@ type Schema = typeof schema;
 
 // Use this type for DrizzleInstance
 export type DrizzleInstance = NodePgDatabase<Schema>;
-
 export const drizzleProvider: Provider[] = [
   {
     provide: DRIZZLE,
@@ -20,11 +19,9 @@ export const drizzleProvider: Provider[] = [
       const connectionString = configService.get<string>('DATABASE_URL');
       const pool = new Pool({
         connectionString,
-      });
-      console.log(connectionString);
-      
+      });      
       await pool.connect();
-      return drizzle(pool, { schema,logger:true});
+      return drizzle(pool, { schema,logger: process.env.NODE_ENV !== 'production'});
     },
     inject: [ConfigService],
   },

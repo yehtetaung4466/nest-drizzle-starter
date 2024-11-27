@@ -1,4 +1,20 @@
 services:
+  reverse-proxy:
+    # The official v3 Traefik docker image
+    image: traefik:v3.1
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker --entrypoints.web.address=:80
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+
+      
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: "no"
   server:
     build:
       context: .
@@ -6,32 +22,41 @@ services:
     environment:
       NODE_ENV: production
     depends_on:
-      testor:
-        condition: service_completed_successfully  # Wait for migration to finish successfully
+      db: 
+        condition: 'service_healthy'
+      # testor:
+      #   condition: service_completed_successfully  # Wait for migration to finish successfully
     env_file:
       - .env.prod
     ports:
-      - "8080:8080"
-    restart: always  # Ensures the server keeps running
+      - "3000"
+    deploy:
+      replicas: 3  # Run 3 instances for load balancing
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=Host(`localhost`)"
+      - "traefik.http.routers.server.entrypoints=web"
+      - "traefik.http.services.server.loadbalancer.server.port=3000"  # Port where your app listens
+    restart: "no"  # Ensures the server keeps running
 
-  migration:
-    build:
-      context: .
-      dockerfile: ./containers/migrator/Dockerfile
-    env_file:
-      - .env.prod
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: "no"  # Don't restart the migrator after it completes
-  testor:
-    build:
-      context: .
-      dockerfile: ./containers/test/Dockerfile
-    depends_on:
-      migration:
-        condition: service_completed_successfully
-    restart: "no" 
+  # migration:
+  #   build:
+  #     context: .
+  #     dockerfile: ./containers/migrator/Dockerfile
+  #   env_file:
+  #     - .env.prod
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   restart: "no"  # Don't restart the migrator after it completes
+  # testor:
+  #   build:
+  #     context: .
+  #     dockerfile: ./containers/test/Dockerfile
+  #   depends_on:
+  #     migration:
+  #       condition: service_completed_successfully
+  #   restart: "no" 
 
   db:
     image: postgres:latest

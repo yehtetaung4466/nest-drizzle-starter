@@ -1,12 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { GeneralErrorException, GeneralHttpException } from './shared/exceptions';
 
-async function bootstrap() {
+async function tailwind() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT || 3000);
+  app.enableCors()
+  app.useGlobalFilters(
+    new GeneralErrorException(),
+    new GeneralHttpException(),
+    // new DatabaseException(),
+  );
+  app.useGlobalPipes(new ValidationPipe());
+  await app.listen(3000);
 }
-bootstrap().catch(err=>{
-  console.log(err);
-  throw err
-  
-});
+tailwind();

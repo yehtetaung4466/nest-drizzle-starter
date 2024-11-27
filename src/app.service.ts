@@ -1,26 +1,23 @@
-import { Get, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { DRIZZLE, DrizzleInstance } from './drizzle/drizzle.provider';
-import { eq, getTableColumns } from 'drizzle-orm';
-import { orders, products } from './drizzle/schema';
+import { ResponseObj } from './shared/classes';
 
 @Injectable()
 export class AppService {
-  constructor(@Inject(DRIZZLE) private drizzle:DrizzleInstance) {
-  //  
-  }
+  constructor(@Inject(DRIZZLE) private drizzle: DrizzleInstance) {}
+
   async getAll() {
-   try{
-    const res = await this.drizzle.query.products.findFirst({
-      with: {
-        orders: true,
-      }
-     })
-     
-  
-      return res
-   }catch(e){
-    console.log(e)
-    throw e
-   }
+    try {
+      // Use the columns in the query
+      const res = await this.drizzle.query.products.findFirst({
+        with: {
+          orders:true // Access only specified columns in the `orders` relation
+        },
+      });
+
+      return new ResponseObj(['success'], res);
+    } catch (e) {
+      throw e;
+    }
   }
 }
